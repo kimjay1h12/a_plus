@@ -34,7 +34,7 @@ const Category = [
   {
     title: "Working",
 
-    icon: <MaterialIcons name="computer" size={34} color="#102660" />,
+    icon: <MaterialIcons name="computer" size={34} color="#407BFF" />,
   },
   {
     title: "Writing",
@@ -44,7 +44,7 @@ const Category = [
   {
     title: "Gaming",
 
-    icon: <Entypo name="game-controller" size={34} color="#102660" />,
+    icon: <Entypo name="game-controller" size={34} color="#407BFF" />,
   },
   {
     title: "Sport",
@@ -54,7 +54,7 @@ const Category = [
   {
     title: "Cooking",
 
-    icon: <Entypo name="game-controller" size={34} color="#102660" />,
+    icon: <Entypo name="game-controller" size={34} color="#407BFF" />,
   },
 ];
 function CreateEvents() {
@@ -128,12 +128,12 @@ function CreateEvents() {
             <AntDesign
               name="arrowleft"
               size={24}
-              color="#102660"
+              color="#407BFF"
               onPress={() => {
                 navigation.goBack();
               }}
             />
-            <Typography variant="h5" fontWeight={700} color="#102660">
+            <Typography variant="h5" fontWeight={700} color="#407BFF">
               Create Events
             </Typography>
             <Text></Text>
@@ -190,7 +190,7 @@ function CreateEvents() {
             >
               <Text
                 style={{
-                  color: themeState.mode === "dark" ? "#fff" : "#102660",
+                  color: themeState.mode === "dark" ? "#fff" : "#407BFF",
                   textAlign: "center",
                   paddingLeft: 15,
                   paddingRight: 15,
@@ -229,7 +229,7 @@ function CreateEvents() {
                 borderRadius: 10,
                 padding: 10,
 
-                color: themeState.mode === "dark" ? "#fff" : "#102660",
+                color: themeState.mode === "dark" ? "#fff" : "#407BFF",
 
                 backgroundColor: themeState.mode === "dark" ? "#222" : "#fff",
               }}
@@ -238,7 +238,7 @@ function CreateEvents() {
                 setFormData({ ...formData, title: e });
               }}
               placeholderTextColor={
-                themeState.mode === "dark" ? "#fff" : "#102660"
+                themeState.mode === "dark" ? "#fff" : "#407BFF"
               }
             />
           </View>
@@ -251,7 +251,7 @@ function CreateEvents() {
             <TextInput
               placeholder="Event Description"
               placeholderTextColor={
-                themeState.mode === "dark" ? "#fff" : "##102660"
+                themeState.mode === "dark" ? "#fff" : "##407BFF"
               }
               style={{
                 height: 150,
@@ -260,7 +260,7 @@ function CreateEvents() {
                 borderRadius: 10,
                 padding: 10,
 
-                color: themeState.mode === "dark" ? "#fff" : "#102660",
+                color: themeState.mode === "dark" ? "#fff" : "#407BFF",
 
                 backgroundColor: themeState.mode === "dark" ? "#222" : "#fff",
               }}
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   ButtonText1: {
-    color: "#102660",
+    color: "#407BFF",
     textAlign: "center",
     paddingLeft: 15,
     paddingRight: 15,
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 8,
     paddingBottom: 8,
-    backgroundColor: "#102660",
+    backgroundColor: "#407BFF",
     borderRadius: 10,
   },
 });

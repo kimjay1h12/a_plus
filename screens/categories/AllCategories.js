@@ -35,7 +35,7 @@ function AllCategories() {
               navigation.goBack();
             }}
           />
-          <Typography variant="h5" fontWeight={700} color="#102660">
+          <Typography variant="h5" fontWeight={700} color="#407BFF">
             Category
           </Typography>
           <Text></Text>
@@ -54,13 +54,13 @@ function AllCategories() {
             <TouchableOpacity key={index}>
               <View style={styles.CategoryCard}>
                 <Text style={{ marginBottom: 10 }}>
-                  <Entypo name="book" size={34} color="#102660" />
+                  <Entypo name="book" size={34} color="#407BFF" />
                 </Text>
                 <Typography
                   active={false}
                   variant="h6"
                   fontWeight={600}
-                  color={themeState.mode === "dark" ? "#fff" : "#102660"}
+                  color={themeState.mode === "dark" ? "#fff" : "#407BFF"}
                 >
                   {cur}
                 </Typography>

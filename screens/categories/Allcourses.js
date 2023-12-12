@@ -18,6 +18,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { child, get, getDatabase, ref } from "firebase/database";
 import { app } from "../../firebase";
+import { mergeObjectsWithSameProperties } from "../../utility";
 function Allcourses({ route }) {
   const [allCourses, setAllCourses] = useState();
   const GetCourses = () => {
@@ -43,9 +44,12 @@ function Allcourses({ route }) {
   useEffect(() => {
     GetCourses();
   }, []);
+  useEffect(() => {
+    const kim = mergeObjectsWithSameProperties(allCourses);
+  }, [allCourses]);
 
   const data = allCourses;
-  console.log(data);
+
   const { themeState } = useContext(GlobalContext);
   const navigation = useNavigation();
   return (
@@ -55,18 +59,19 @@ function Allcourses({ route }) {
           padding: 18,
           backgroundColor: themeState.value,
           height: "100%",
+          marginTop: 10,
         }}
       >
         <View style={styles.header}>
           <AntDesign
             name="arrowleft"
             size={24}
-            color={themeState.mode === "dark" ? "#fff" : "#102660"}
+            color={themeState.mode === "dark" ? "#fff" : "#000"}
             onPress={() => {
               navigation.goBack();
             }}
           />
-          <Typography variant="h5" fontWeight={700} color="#102660">
+          <Typography variant="h5" fontWeight={700}>
             Course
           </Typography>
           <Text></Text>
@@ -76,25 +81,19 @@ function Allcourses({ route }) {
             <TouchableOpacity
               key={index}
               onPress={() => {
-                navigation.navigate("Course", {
-                  data: {
-                    image: cur.image,
-                    authorName: cur.authorName,
-                    coursecode: cur.Coursecode,
-                    courseTitle: cur.courseTitle,
+                const filteredArray = allCourses.filter(
+                  (obj) => obj.key === cur.key
+                );
 
-                    courseDescription: cur.courseDescription,
-                    authorDescription: cur.authorDescription,
-                    courseUrl: cur.courseUrl,
-                    createdAt: cur.createdAt,
-                  },
+                navigation.navigate("Course", {
+                  data: filteredArray,
                 });
               }}
             >
               <CourseCategoryCard
                 image={cur.image}
                 key={index}
-                title={cur.courseTitle}
+                title={cur.key}
                 description={cur.courseDescription}
                 coursecode={cur.Coursecode}
                 userKey={cur.userkey}

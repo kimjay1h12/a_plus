@@ -3,7 +3,6 @@ import * as NavigationBar from "expo-navigation-bar";
 import { Platform } from "react-native";
 
 export default function themeReducer(state, { type, payload }) {
-
   // Platform
   if (payload === "dark" || type === "dark") {
     SystemUI.setBackgroundColorAsync("#111111");
@@ -25,7 +24,7 @@ export default function themeReducer(state, { type, payload }) {
     case "default":
       return { ...state, mode: "default", value: payload };
     case "light":
-      return { ...state, mode: "light", value: "#f7f7f7" };
+      return { ...state, mode: "light", value: "#ffff" };
     default:
       return state;
   }

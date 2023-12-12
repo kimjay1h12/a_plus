@@ -1,31 +1,28 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/core";
+import * as Haptics from "expo-haptics";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { ref, runTransaction } from "firebase/database";
+import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Button,
   Dimensions,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Audio } from "expo-av";
-import * as Haptics from "expo-haptics";
+import { TextField2 } from "../components/custom/TextField";
 import Typography from "../components/custom/Typography";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/core";
-import { useContext, useEffect, useState } from "react";
 import { GlobalContext } from "../context";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import {} from "react";
-import { ref, runTransaction } from "firebase/database";
 import { db } from "../firebase";
+import Button from "../components/custom/Button";
+import { ImageBackground } from "react-native";
 
 function Login() {
   const [loading, setLoading] = useState(false);
@@ -155,90 +152,100 @@ function Login() {
       }}
     >
       <ScrollView keyboardShouldPersistTaps="handled">
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ flex: 1 }}
-        >
-          <View style={styles.root}>
-            <View>
-              <View style={{ flex: 0, alignItems: "center" }}>
-                <Typography variant="h1" color="#102660" fontWeight={700}>
-                  Welcome
-                </Typography>
-              </View>
-              <View
-                style={{
-                  marginTop: 20,
-                  flex: 0,
-                  alignItems: "center",
-                  padding: 30,
-                }}
-              >
-                <TextInput
-                  placeholder="Email"
-                  placeholderTextColor="#102660"
-                  style={styles.input}
-                  value={email}
-                  onChangeText={(e) => {
-                    setEmail(e);
-                  }}
-                />
-                <TextInput
-                  placeholder="Password"
-                  placeholderTextColor="#102660"
-                  style={styles.input}
-                  value={password}
-                  secureTextEntry={true}
-                  onChangeText={(e) => {
-                    setPassword(e);
-                  }}
-                />
-              </View>
-              <View style={{ marginTop: 10, marginBottom: 10 }}>
-                <Typography variant="h6" fontWeight={600} color="#102660">
-                  Forgot Password ?
-                </Typography>
-              </View>
+        <ImageBackground
+          source={require("../assets/img/clipart.png")}
+          style={{
+            width: "100%",
+            height: Dimensions.get("screen").height,
+            flex: 1,
 
-              <View>
-                <TouchableOpacity
-                  style={styles.Button}
-                  onPress={() => {
-                    SignIn();
-                  }}
-                >
-                  {loading ? (
-                    <ActivityIndicator color="#fff" />
-                  ) : (
-                    <Text style={styles.ButtonText}>Login</Text>
-                  )}
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  marginTop: 10,
-                  marginBottom: 10,
-                  flex: 0,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  flexDirection: "row",
-                  gap: 2,
+            justifyContent: "center",
+          }}
+        >
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{
+              padding: 10,
+            }}
+          >
+            <View style={{ flex: 0, alignItems: "center", marginBottom: 10 }}>
+              <Typography variant="h1" fontWeight={700}>
+                Login
+              </Typography>
+            </View>
+            <View
+              style={{
+                marginTop: 20,
+                flex: 0,
+                alignItems: "center",
+              }}
+            >
+              <TextField2
+                placeholder="Email"
+                value={email}
+                onChangeText={(e) => {
+                  setEmail(e);
+                }}
+              />
+              <TextField2
+                placeholder="Password"
+                value={password}
+                secureTextEntry={true}
+                onChangeText={(e) => {
+                  setPassword(e);
+                }}
+              />
+            </View>
+            {/* <View style={{ marginTop: 10, marginBottom: 10 }}>
+              <Typography variant="h6" fontWeight={600} color="#407BFF">
+                Forgot Password ?
+              </Typography>
+            </View> */}
+
+            <View style={{ marginTop: 10 }}>
+              <Button
+                title="Login"
+                onPress={() => {
+                  SignIn();
+                }}
+                loading={loading}
+              />
+
+              {/* <TouchableOpacity
+                style={styles.Button}
+              
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.ButtonText}>Login</Text>
+                )}
+              </TouchableOpacity> */}
+            </View>
+            <View
+              style={{
+                marginTop: 10,
+                marginBottom: 10,
+                flex: 0,
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+                gap: 2,
+              }}
+            >
+              <Typography variant="h6" fontWeight={600} color="#407BFF">
+                Don't have an account yet?
+              </Typography>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Signup");
                 }}
               >
-                <Typography variant="h6" fontWeight={600} color="#102660">
-                  Don't have an account yet?
-                </Typography>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("Signup");
-                  }}
-                >
-                  <Text style={{ fontSize: 15, color: "#f90" }}>Signup</Text>
-                </TouchableOpacity>
-              </View>
+                <Text style={{ fontSize: 15, color: "#f90" }}>Signup</Text>
+              </TouchableOpacity>
             </View>
-          </View>
-        </KeyboardAvoidingView>
+          </KeyboardAvoidingView>
+        </ImageBackground>
       </ScrollView>
     </SafeAreaView>
   );
@@ -246,17 +253,15 @@ function Login() {
 const styles = StyleSheet.create({
   root: {
     width: "100%",
-    flex: 3,
-    justifyContent: "center",
-    padding: Platform.OS === "ios" ? 20 : 10,
+    flex: 1,
+
     height: "100%",
     marginTop: "50%",
   },
   ButtonText: {
     color: "#fff",
     textAlign: "center",
-    paddingLeft: 15,
-    paddingRight: 15,
+
     fontSize: 20,
     fontWeight: "700",
   },
@@ -268,7 +273,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 8,
     paddingBottom: 8,
-    backgroundColor: "#102660",
+    backgroundColor: "#407BFF",
     borderRadius: 10,
   },
 
@@ -279,7 +284,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     width: Dimensions.get("window").width - 20,
-    color: "#102660",
+    color: "#407BFF",
     borderColor: "#fff",
 
     backgroundColor: "#fff",

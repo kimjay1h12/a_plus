@@ -71,6 +71,23 @@ const uploadFileBlob = async (uri) => {
 
   return await blob;
 };
+export function removeObjectsWithoutParameter(arr, parameter) {
+  return arr.filter((obj) => obj.hasOwnProperty(parameter));
+}
+export function mergeObjectsWithSameProperties(arr) {
+  const mergedObjects = {};
+
+  arr?.forEach((obj) => {
+    const key = JSON.stringify(Object.keys(obj).sort()); // Generate a unique key based on sorted property names
+    if (mergedObjects[key]) {
+      Object.assign(mergedObjects[key], obj);
+    } else {
+      mergedObjects[key] = { ...obj };
+    }
+  });
+
+  return Object.values(mergedObjects);
+}
 
 export const GetUserInfo = (value) => {
   const dbRef = ref(getDatabase());

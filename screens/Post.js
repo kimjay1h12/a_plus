@@ -2,32 +2,33 @@ import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Keyboard,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import * as DocumentPicker from "expo-document-picker";
-import { Entypo } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
-import Typography from "../components/custom/Typography";
-import { GlobalContext } from "../context";
+
+import { Video } from "expo-av";
+
+import { SaveFormat, manipulateAsync } from "expo-image-manipulator";
+
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
-import { Categories, uploadHelper } from "../utility";
+import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-import { Database, child, get, getDatabase, push } from "firebase/database";
-import { firebaseConfig } from "../firebase";
 import { initializeApp } from "firebase/app";
+import { getDatabase, set } from "firebase/database";
+import { ref } from "firebase/storage";
 import { Image } from "react-native";
-import { getStorage, ref } from "firebase/storage";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Button from "../components/custom/Button";
+import { TextField2 } from "../components/custom/TextField";
+import Typography from "../components/custom/Typography";
+import { GlobalContext } from "../context";
+import { firebaseConfig } from "../firebase";
 import { firebasec1 } from "../firebase1";
 import { firebasec } from "../firebasedata";
 function Post() {
@@ -39,18 +40,34 @@ function Post() {
   const [image, setImage] = useState();
   const [userData, setUserData] = useState();
   const [formdata, setFormdata] = useState({
-    courseTitle: "",
+    courseCategory: "web_development",
 
     courseDescription: "",
-    category: "English Language",
-    Coursecode: "",
-    authorName: "",
-    authorDescription: "",
-    courseUrl: "",
-    image: "",
+    courseTitle: "",
+    document: [],
+    videos: [],
+
     createdAt: "",
     userkey: authState.data.userId,
   });
+  const courseCategory = [
+    {
+      label: "Web Development",
+      value: "web_development",
+    },
+    {
+      label: "Software Engineering",
+      value: "software_engineering",
+    },
+    {
+      label: "Cyber Security",
+      value: "cyber_security",
+    },
+    {
+      label: "Mobile App Development",
+      value: "mobileapp_development",
+    },
+  ];
   const app = initializeApp(firebaseConfig);
   // const GetUserInfo = () => {
   //   const dbRef = ref(getDatabase());
@@ -74,6 +91,7 @@ function Post() {
   // useEffect(() => {
   //   GetUserInfo();
   // }, [authState.data.userId]);
+
   const storage = firebasec1.storage();
   const storageRef = storage.ref();
   const database = firebasec.database();
@@ -86,70 +104,205 @@ function Post() {
   };
   useEffect(() => {
     getCurrentDate();
-  }, []);
+  }, [authState]);
+  const [videoUris, setVideoUris] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
+  const handleVideoUpload = async () => {
+    try {
+      if (videoUris.length === 0) {
+        console.log("No videos selected.");
+        return;
+      }
+
+      const promises = videoUris.map(async (videoUri, index) => {
+        // const processedVideoUri = await VideoProcessing.compress(videoUri, {
+        //   bitrateMultiplier: 3,
+        //   width: 720,
+        //   height: 1280,
+        //   saveToCameraRoll: false,
+        //   saveWithCurrentDate: true,
+        // });
+
+        //     const uploadTask = ref.put(blob);
+        //     uploadTask.on("state_changed", {
+        //       // Optional function to track upload progress
+        //     });
+        //     uploadTask.then(async () => {
+        //       const url = await ref.getDownloadURL();
+        //       setDocName(name);
+        //       setFormdata({ ...formdata, courseUrl: url });
+        //       setLoadingDoc(false);
+        //     });
+        //     setLoadingDoc(false);
+        //   }
+        const response = await fetch(videoUri?.uri);
+        const blob = await response.blob();
+        const ref = storageRef.child(`videos/${videoUri.fileName}`);
+        const uploadTask = ref.put(blob);
+        uploadTask.on("state_changed", (taskSnapshot) => {
+          const progress =
+            (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100;
+          setUploadProgress(progress);
+        });
+        return uploadTask.then(async () => {
+          const downloadUrl = await ref.getDownloadURL();
+          return downloadUrl;
+        });
+      });
+
+      const url = await Promise.all(promises);
+      console.log(url, "url");
+      setFormdata({
+        ...formdata,
+        videos: url,
+      });
+      setUploadProgress(0);
+      console.log("All videos uploaded successfully.");
+    } catch (error) {
+      console.error("Error uploading videos: ", error);
+    }
+  };
+  const handleDocumentUpload = async () => {
+    try {
+      if (documents.length === 0) {
+        console.log("No videos selected.");
+        return;
+      }
+
+      const promises = documents.map(async (doc, index) => {
+        // const processedVideoUri = await VideoProcessing.compress(videoUri, {
+        //   bitrateMultiplier: 3,
+        //   width: 720,
+        //   height: 1280,
+        //   saveToCameraRoll: false,
+        //   saveWithCurrentDate: true,
+        // });
+
+        //     const uploadTask = ref.put(blob);
+        //     uploadTask.on("state_changed", {
+        //       // Optional function to track upload progress
+        //     });
+        //     uploadTask.then(async () => {
+        //       const url = await ref.getDownloadURL();
+        //       setDocName(name);
+        //       setFormdata({ ...formdata, courseUrl: url });
+        //       setLoadingDoc(false);
+        //     });
+        //     setLoadingDoc(false);
+        //   }
+        const response = await fetch(doc?.uri);
+        const blob = await response.blob();
+        const ref = storageRef.child(`documents/${doc.fileName}`);
+        const uploadTask = ref.put(blob);
+        uploadTask.on("state_changed", (taskSnapshot) => {
+          const progress =
+            (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100;
+          setUploadProgress(progress);
+        });
+        return uploadTask.then(async () => {
+          const downloadUrl = await ref.getDownloadURL();
+          return downloadUrl;
+        });
+      });
+
+      const url = await Promise.all(promises);
+      setFormdata({
+        ...formdata,
+        document: url,
+      });
+      console.log(url, "url");
+      setUploadProgress(0);
+      console.log("All Documents uploaded successfully.");
+    } catch (error) {
+      console.error("Error uploading Document: ", error);
+    }
+  };
+  console.log("formdata", formdata);
+  const handleVideoPicker = async (isCamera) => {
+    await ImagePicker.requestCameraPermissionsAsync();
+    await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const image = await ImagePicker["launchImageLibraryAsync"]({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+
+      allowsEditing: true,
+      aspect: [4, 3],
+      // videoQuality: 0.5,
+      videoMaxDuration: 600,
+      quality: 1,
+    });
+
+    if (!image.canceled) {
+      let result = { ...image };
+      if (image.assets[0]?.type === "image") {
+        let resized = await manipulateAsync(
+          image.assets[0].uri,
+          [
+            {
+              resize: { width: 900 },
+            },
+          ],
+          {
+            compress: 0.5,
+            format: SaveFormat.JPEG,
+          }
+        );
+        result.assets[0].uri = resized.uri;
+      }
+
+      // if (result.fileSize > 5000000)
+      //   return Alert.alert(
+      //     "File size too large"ol
+      //     "File size should be less than 10MB"
+      //   );
+
+      const r = [...videoUris];
+      const b = result?.assets[0];
+      const c = r?.push(b);
+      setVideoUris(r);
+
+      return result?.assets[0];
+    }
+    console.log("video", null);
+    return null;
+  };
   const [docName, setDocName] = useState("Add Course File e.g pdf ,docs ...");
-  async function handleImageUpload() {
-    const { uri, assets } = await ImagePicker.launchImageLibraryAsync();
-
-    const fileName = assets.map((cur) => cur.fileName);
-
-    const response = await fetch(uri);
-    const blob = await response.blob();
-
-    const ref = storageRef.child(`images/${fileName}`);
-    const uploadTask = ref.put(blob);
-    uploadTask.on("state_changed", {
-      // Optional function to track upload progress
-      progress: (snapshot) => {
-        alert("loading upload progress");
-      },
+  const [documents, setDocuments] = useState([]);
+  async function handleDocumentPicker() {
+    const res = await DocumentPicker.getDocumentAsync({
+      type: "*/*",
+      multiple: true,
+      copyToCacheDirectory: true,
     });
-    uploadTask.then(async () => {
-      const url = await ref.getDownloadURL();
-
-      setFormdata({ ...formdata, image: url });
-    });
-  }
-
-  async function handleDocumentUpload() {
-    const { uri, name, type } = await DocumentPicker.getDocumentAsync();
-
-    const response = await fetch(uri);
-    const blob = await response.blob();
-    const ref = storageRef.child(`documents/${name}`);
-    const uploadTask = ref.put(blob);
-    uploadTask.on("state_changed", {
-      // Optional function to track upload progress
-    });
-    uploadTask.then(async () => {
-      const url = await ref.getDownloadURL();
-      setDocName(name);
-      setFormdata({ ...formdata, courseUrl: url });
-      setLoadingDoc(false);
-    });
-    setLoadingDoc(false);
+    const r = [...documents];
+    const b = res;
+    const c = r?.push(b);
+    setDocuments(r);
+    console.log(res, "doe");
+    // const response = await fetch(uri);
+    // const blob = await response.blob();
+    // const ref = storageRef.child(`documents/${name}`);
+    // const uploadTask = ref.put(blob);
+    // uploadTask.on("state_changed", {
+    //   // Optional function to track upload progress
+    // });
+    // uploadTask.then(async () => {
+    //   const url = await ref.getDownloadURL();
+    //   setDocName(name);
+    //   setFormdata({ ...formdata, courseUrl: url });
+    //   setLoadingDoc(false);
+    // });
+    // setLoadingDoc(false);
   }
 
   function uploadUserData(formdata) {
-    const usersRef = database.ref("courses");
-    const userRef = usersRef.push();
+    const usersRef = database.ref("courses/" + formdata?.courseCategory);
 
-    userRef
-      .set(formdata)
+    usersRef
+      .push(formdata)
       .then(() => {
         Alert.alert("Success");
-        setFormdata({
-          courseTitle: "",
 
-          courseDescription: "",
-          category: "",
-          Coursecode: "",
-          authorName: "",
-          authorDescription: "",
-          courseUrl: "",
-          image: "",
-        });
         navigation.goBack();
       })
       .catch((error) => {
@@ -158,23 +311,12 @@ function Post() {
         setLoading(false);
       });
   }
-  function writeUserData(formdata) {
+  function writeUserData() {
     const db = getDatabase(app);
-    push(ref(db, "couses/" + "data"), formdata);
+    const loc = formdata?.courseCategory;
+    set(ref(db, "couses/" + loc), formdata);
     setLoading(false);
     Alert.alert("Success");
-    setFormdata({
-      courseTitle: "",
-
-      courseDescription: "",
-      category: "",
-      Coursecode: "",
-      authorName: "",
-      authorDescription: "",
-      courseUrl: "",
-      image: "",
-    });
-    navigation.goBack();
   }
 
   return (
@@ -197,19 +339,19 @@ function Post() {
           <View style={styles.header}>
             <AntDesign
               name="arrowleft"
-              size={34}
-              color={themeState.mode === "dark" ? "#fff" : "#102660"}
+              size={28}
+              color={themeState.mode === "dark" ? "#aaa" : "#000"}
               onPress={() => {
                 navigation.goBack();
               }}
             />
-            <Typography variant="h5" fontWeight={700} color="#102660">
+            <Typography variant="h5" fontWeight={700}>
               Create Course
             </Typography>
             <Text></Text>
           </View>
           <View style={{ marginTop: 70 }}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={{
                 height: 350,
                 margin: 5,
@@ -227,7 +369,7 @@ function Post() {
                 <Entypo
                   name="camera"
                   size={64}
-                  color={themeState.mode === "dark" ? "#fff" : "##102660"}
+                  color={themeState.mode === "dark" ? "#fff" : "##407BFF"}
                 />
               ) : (
                 <Image
@@ -242,74 +384,24 @@ function Post() {
                   }}
                 />
               )}
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
-          <View style={{ marginTop: 30 }}>
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={modalVisible}
-              onRequestClose={() => {
-                Alert.alert("Modal has been closed.");
-                setModalVisible(!modalVisible);
+          <View style={{ marginTop: 10 }}>
+            <TextField2
+              placeholder="Course Category"
+              value={formdata.courseCategory}
+              options={courseCategory.map((cur) => ({
+                value: cur.value,
+                label: cur.label,
+              }))}
+              onChangeText={(e) => {
+                setFormdata({
+                  ...formdata,
+                  courseCategory: e,
+                });
               }}
-            >
-              <View style={styles.centeredView}>
-                <View
-                  style={{
-                    margin: 10,
-                    marginTop: "50%",
-                    backgroundColor:
-                      themeState.mode === "dark" ? "#222" : "#fff",
-                    borderRadius: 20,
-                    padding: 35,
-                    alignItems: "center",
-                    shadowColor: "#000",
-                    shadowOffset: {
-                      width: 0,
-                      height: 2,
-                    },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 4,
-                    elevation: 5,
-                  }}
-                >
-                  {Categories.map((cur, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      style={{ marginTop: 10 }}
-                      onPress={() => {
-                        setModalVisible(!modalVisible);
-                        setFormdata({
-                          ...formdata,
-                          category: cur,
-                        });
-                      }}
-                    >
-                      <Typography variant="h5" active={true}>
-                        {cur}
-                      </Typography>
-                    </TouchableOpacity>
-                  ))}
-                  <TouchableOpacity
-                    style={{
-                      backgroundColor: "red",
-                      padding: 7,
-                      borderRadius: 5,
-                      marginTop: 10,
-                    }}
-                    onPress={() => {
-                      setModalVisible(!modalVisible);
-                    }}
-                  >
-                    <Typography variant="h5" active={false}>
-                      Cancel
-                    </Typography>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </Modal>
-            <TextInput
+            />
+            <TextField2
               placeholder="Course Title"
               value={formdata.courseTitle}
               onChangeText={(e) => {
@@ -318,98 +410,10 @@ function Post() {
                   courseTitle: e,
                 });
               }}
-              placeholderTextColor={
-                themeState.mode === "dark" ? "#fff" : "##102660"
-              }
-              style={{
-                margin: 6,
-                borderWidth: 1,
-                borderRadius: 10,
-                padding: 10,
-                height: 50,
-                color: themeState.mode === "dark" ? "#fff" : "#102660",
-
-                backgroundColor: themeState.mode === "dark" ? "#222" : "#fff",
-              }}
             />
-            <TextInput
-              placeholder="Course Code"
-              value={formdata.Coursecode}
-              onChangeText={(e) => {
-                setFormdata({
-                  ...formdata,
-                  Coursecode: e,
-                });
-              }}
-              placeholderTextColor={
-                themeState.mode === "dark" ? "#fff" : "##102660"
-              }
-              style={{
-                margin: 6,
-                borderWidth: 1,
-                borderRadius: 10,
-                padding: 10,
-                height: 50,
-                color: themeState.mode === "dark" ? "#fff" : "#102660",
 
-                backgroundColor: themeState.mode === "dark" ? "#222" : "#fff",
-              }}
-            />
-            <TouchableOpacity
-              onPress={() => {
-                setModalVisible(!modalVisible), Keyboard.dismiss;
-              }}
-            >
-              <TouchableOpacity
-                style={{
-                  height: 50,
-                  flex: 0,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginTop: 10,
-                  paddingTop: 8,
-                  marginBottom: 10,
-                  paddingBottom: 8,
-
-                  borderRadius: 10,
-                  marginLeft: Platform.OS === "ios" ? 8 : 0,
-                  marginRight: Platform.OS === "ios" ? 8 : 0,
-                  backgroundColor: themeState.mode === "dark" ? "#222" : "#fff",
-                }}
-                onPress={() => {
-                  setModalVisible(!modalVisible), Keyboard.dismiss;
-                }}
-              >
-                <Text
-                  style={{
-                    color: themeState.mode === "dark" ? "#fff" : "#102660",
-                    textAlign: "center",
-                    paddingLeft: 15,
-                    paddingRight: 15,
-                    fontSize: 20,
-                    fontWeight: "700",
-                  }}
-                >
-                  {formdata.category}
-                </Text>
-              </TouchableOpacity>
-            </TouchableOpacity>
-            <TextInput
+            <TextField2
               placeholder="Course Description"
-              placeholderTextColor={
-                themeState.mode === "dark" ? "#fff" : "##102660"
-              }
-              style={{
-                margin: 6,
-                borderWidth: 1,
-                borderRadius: 10,
-                padding: 10,
-                height: 150,
-                color: themeState.mode === "dark" ? "#fff" : "#102660",
-
-                backgroundColor: themeState.mode === "dark" ? "#222" : "#fff",
-              }}
-              multiline
               value={formdata.courseDescription}
               onChangeText={(e) => {
                 setFormdata({
@@ -418,91 +422,128 @@ function Post() {
                 });
               }}
             />
-            <TextInput
-              placeholder="Author Name"
-              value={formdata.authorName}
-              onChangeText={(e) => {
-                setFormdata({
-                  ...formdata,
-                  authorName: e,
-                });
-              }}
-              placeholderTextColor={
-                themeState.mode === "dark" ? "#fff" : "##102660"
-              }
-              style={{
-                margin: 6,
-                borderWidth: 1,
-                borderRadius: 10,
-                padding: 10,
-                height: 50,
-                color: themeState.mode === "dark" ? "#fff" : "#102660",
-
-                backgroundColor: themeState.mode === "dark" ? "#222" : "#fff",
-              }}
-            />
-            <TextInput
-              placeholder="Author Description"
-              placeholderTextColor={
-                themeState.mode === "dark" ? "#fff" : "##102660"
-              }
-              style={{
-                margin: 6,
-                borderWidth: 1,
-                borderRadius: 10,
-                padding: 10,
-                height: 50,
-                color: themeState.mode === "dark" ? "#fff" : "#102660",
-
-                backgroundColor: themeState.mode === "dark" ? "#222" : "#fff",
-              }}
-              multiline
-              value={formdata.authorDescription}
-              onChangeText={(e) => {
-                setFormdata({
-                  ...formdata,
-                  authorDescription: e,
-                });
-              }}
-            />
-            <TouchableOpacity
-              style={{
-                height: 50,
-                flex: 0,
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: 10,
-                paddingTop: 8,
-                paddingBottom: 8,
-
-                borderRadius: 10,
-                marginLeft: Platform.OS === "ios" ? 8 : 0,
-                marginRight: Platform.OS === "ios" ? 8 : 0,
-                backgroundColor: themeState.mode === "dark" ? "#222" : "#fff",
-              }}
-              onPress={() => {
-                setLoadingDoc(true);
-                handleDocumentUpload();
-                setLoadingDoc(false);
-              }}
-            >
-              {loadingDoc ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text
+            <View style={{ marginBottom: 10 }}>
+              <TouchableOpacity
+                onPress={handleVideoPicker}
+                style={{
+                  backgroundColor: "#f7f7f7",
+                  width: "100%",
+                  height: 100,
+                  borderRadius: 10,
+                  flex: 0,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Typography variant="h6">Add Video</Typography>
+              </TouchableOpacity>
+              {videoUris?.length > 0 && (
+                <View style={{ marginTop: 10 }}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {videoUris?.map((selectedImages, i) => (
+                      <Video
+                        // ref={video}
+                        key={i}
+                        source={{
+                          uri: selectedImages.uri,
+                        }}
+                        useNativeControls
+                        resizeMode="contain"
+                        // isLooping
+                        style={{
+                          width: 200,
+                          height: 300,
+                          marginRight: 10,
+                          borderRadius: 20,
+                        }}
+                      />
+                    ))}
+                  </ScrollView>
+                  <Button
+                    style={{ marginTop: 10 }}
+                    title="Upload Videos"
+                    onPress={handleVideoUpload}
+                  />
+                  {uploadProgress > 0 && (
+                    <Typography variant="h5">
+                      {Math.round(uploadProgress)}
+                    </Typography>
+                  )}
+                </View>
+              )}
+            </View>
+            <View>
+              <View style={{ marginBottom: 10 }}>
+                <TouchableOpacity
+                  onPress={handleDocumentPicker}
                   style={{
-                    color: themeState.mode === "dark" ? "#fff" : "#102660",
-                    textAlign: "center",
-                    paddingLeft: 15,
-                    paddingRight: 15,
-                    fontSize: 20,
-                    fontWeight: "700",
+                    backgroundColor: "#f7f7f7",
+                    width: "100%",
+                    height: 100,
+                    borderRadius: 10,
+                    flex: 0,
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
-                  {docName}
-                </Text>
+                  <Typography variant="h6">Add Document</Typography>
+                </TouchableOpacity>
+              </View>
+              {documents?.length > 0 && (
+                <View style={{ marginTop: 10 }}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {documents.map((item, i) => (
+                      <TouchableOpacity
+                        key={i}
+                        style={[
+                          styles.videoThumbnail,
+                          {
+                            borderColor:
+                              themeState.mode === "light" ? "#000" : "#aaa",
+                            padding: 10,
+                          },
+                        ]}
+                      >
+                        <Image
+                          source={require("../assets/img/document.png")}
+                          style={{
+                            width: 200,
+                            height: 250,
+                            resizeMode: "contain",
+                          }}
+                        />
+                        <View
+                          style={{
+                            flex: 0,
+                            alignItems: "center",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            paddingRight: 2,
+                          }}
+                        >
+                          <View style={{ marginBottom: 3 }}>
+                            <Typography variant="h6" fontWeight={700}>
+                              {item.name}
+                            </Typography>
+                          </View>
+                        </View>
+                        {/* You can use custom video thumbnail images here */}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                  <Button
+                    style={{ marginTop: 10, marginBottom: 10 }}
+                    title="Upload Documents"
+                    onPress={handleDocumentUpload}
+                  />
+                  {uploadProgress > 0 && (
+                    <Typography variant="h5">
+                      {Math.round(uploadProgress)}
+                    </Typography>
+                  )}
+                </View>
               )}
-            </TouchableOpacity>
+            </View>
           </View>
           <View style={{ marginTop: 30 }}>
             <TouchableOpacity
@@ -549,7 +590,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
 
-    color: "#102660",
+    color: "#407BFF",
     borderColor: "#fff",
 
     backgroundColor: "#fff",
@@ -561,13 +602,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
 
-    color: "#102660",
+    color: "#407BFF",
     borderColor: "#fff",
 
     backgroundColor: "#fff",
   },
   ButtonText: {
-    color: "#102660",
+    color: "#407BFF",
     textAlign: "center",
     paddingLeft: 15,
     paddingRight: 15,
@@ -604,10 +645,18 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 8,
     paddingBottom: 8,
-    backgroundColor: "#102660",
+    backgroundColor: "#407BFF",
     borderRadius: 10,
     marginLeft: Platform.OS === "ios" ? 10 : 0,
     marginRight: Platform.OS === "ios" ? 10 : 0,
+  },
+  videoThumbnail: {
+    minWidth: 200,
+    minHeight: 250,
+    marginRight: 10,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderRadius: 20,
   },
 });
 export default Post;

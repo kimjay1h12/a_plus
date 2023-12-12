@@ -10,7 +10,7 @@ function Typography({
   active = { true: true },
 }) {
   const fontSize = {
-    h1: 50,
+    h1: 45,
     h2: 37,
     h3: 32,
     h4: 27,
@@ -28,7 +28,7 @@ function Typography({
       <Text
         style={{
           fontSize: fontSize[variant],
-          color: themeState.mode === "dark" ? "#fff" : "#102660",
+          color: color ? color : themeState.mode === "dark" ? "#aaa" : "#000",
           fontWeight: fontWeight.toString(),
           flex: 0,
         }}

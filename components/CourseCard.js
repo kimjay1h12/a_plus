@@ -85,16 +85,16 @@ function CourseCard({ category, description, rating, url, author, title }) {
               color="#f90"
               style={{ marginRight: 4 }}
             />
-            <Typography color="#102660" active={false}>
+            <Typography color="#407BFF" active={false}>
               {rating}
             </Typography>
           </View>
         </View>
         <View style={{ marginTop: 10 }}>
-          <Typography variant="body1" color="#102660" active={false}>
+          <Typography variant="body1" color="#407BFF" active={false}>
             {category}
           </Typography>
-          <Typography variant="h6" color="#102660" active={false}>
+          <Typography variant="h6" color="#407BFF" active={false}>
             {description}
           </Typography>
         </View>
@@ -112,7 +112,7 @@ function CourseCard({ category, description, rating, url, author, title }) {
           <Typography
             variant="h6"
             fontWeight={700}
-            color="#102660"
+            color="#407BFF"
             active={false}
           >
             {author}

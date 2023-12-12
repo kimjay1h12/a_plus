@@ -1,7 +1,6 @@
 import {
   Alert,
   BackHandler,
-  Button,
   Image,
   Linking,
   SafeAreaView,
@@ -11,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { useContext, useEffect, useState } from "react";
@@ -19,6 +19,7 @@ import { useNavigation } from "@react-navigation/native";
 import { GlobalContext } from "../context";
 import Typography from "../components/custom/Typography";
 import * as Network from "expo-network";
+import { Dimensions } from "react-native";
 function Onboarding() {
   const navigation = useNavigation();
   const [steps, setSteps] = useState(0);
@@ -64,27 +65,84 @@ function Onboarding() {
   }, []);
 
   return (
-    <ScrollView
+    <View
       style={{ height: "100%", backgroundColor: themeState.value, flex: 1 }}
     >
-      <Amination>
-        <View style={{ flex: 1 }}>
-          <View style={{ width: "100%" }}>
-            <Image
-              style={{ width: "100%" }}
-              source={require("../assets/img/onboarding1.png")}
-            />
+      {steps === 0 && (
+        <View
+          style={{
+            flex: 1,
+            width: "100%",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexDirection: "column",
+          }}
+        >
+          <Image
+            source={require("../assets/img/aplus.gif")}
+            style={{
+              width: Dimensions.get("screen").width,
+              maxHeight: Dimensions.get("screen").height - 300,
+              resizeMode: "contain",
+            }}
+          />
+          <View
+            style={{
+              flex: 0,
+
+              padding: 0,
+              alignItems: "center",
+              justifyContent: "space-between",
+
+              flexDirection: "column",
+            }}
+          >
+            <Typography variant="h1" fontWeight={700}>
+              Boost Your
+            </Typography>
+            <Typography variant="h2">Digital Education Online</Typography>
           </View>
-          <View style={{ marginTop: 20 }}>
+          <Amination>
+            <TouchableOpacity
+              style={[styles.LoginButton, { marginBottom: 70 }]}
+              onPress={() => {
+                setSteps(steps + 1);
+              }}
+            >
+              <Text style={styles.LoginButtonText}>
+                Get Started
+                <AntDesign name="arrowright" size={20} color={"#fff"} />
+              </Text>
+            </TouchableOpacity>
+          </Amination>
+        </View>
+      )}
+      {steps === 1 && (
+        <View
+          style={{
+            flex: 1,
+            width: "100%",
+          }}
+        >
+          <Image
+            style={{
+              width: "100%",
+              maxHeight: Dimensions.get("screen").height - 300,
+              resizeMode: "contain",
+            }}
+            source={require("../assets/img/aplus1.png")}
+          />
+
+          <View style={{ marginTop: 3 }}>
             <View style={styles.TextSection}>
-              <Typography variant="h1" fontWeight={700} color="#102660">
+              <Typography variant="h1" fontWeight={700}>
                 Get your best result ever...
               </Typography>
             </View>
           </View>
-          <View style={{ padding: 20, marginTop: 20 }}>
+          <View style={{ padding: 20, marginTop: 20, marginBottom: 70 }}>
             <TouchableOpacity
-              style={styles.LoginButton}
+              style={[styles.LoginButton, { backgroundColor: "#aaa" }]}
               onPress={() => navigation.navigate("Signup")}
             >
               <Text style={styles.LoginButtonText}>Sign Up</Text>
@@ -97,8 +155,8 @@ function Onboarding() {
             </TouchableOpacity>
           </View>
         </View>
-      </Amination>
-    </ScrollView>
+      )}
+    </View>
   );
 }
 
@@ -117,8 +175,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingLeft: 15,
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: "700",
     paddingRight: 15,
+    width: Dimensions.get("screen").width - 30,
   },
   image: {
     alignItems: "center",
@@ -131,21 +190,22 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 8,
     paddingBottom: 8,
-    backgroundColor: "#102660",
+    backgroundColor: "#407BFF",
     borderRadius: 15,
   },
 
   LoginButton: {
-    minWidth: 150,
+    minWidth: 180,
     minHeight: 50,
     marginTop: 10,
     flex: 0,
     justifyContent: "center",
-    borderRadius: 5,
+    borderRadius: 20,
     alignItems: "center",
     paddingTop: 8,
     paddingBottom: 8,
-    backgroundColor: "#102660",
+
+    backgroundColor: "#407BFF",
   },
   TextSection: {
     padding: 15,

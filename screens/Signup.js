@@ -31,6 +31,8 @@ import { Universities } from "../utility";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { firebasec } from "../firebasedata";
 import { Dimensions } from "react-native";
+import { TextField2 } from "../components/custom/TextField";
+import { ImageBackground } from "react-native";
 function Signup() {
   const navigation = useNavigation();
   const { themeState, themeDispatch, authDispatch, authState } =
@@ -121,16 +123,28 @@ function Signup() {
       { text: "OK", onPress: () => navigation.navigate("Login") },
     ]);
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: themeState.value }}>
-      <ScrollView keyboardShouldPersistTaps="handled">
+    <ScrollView
+      style={{ flex: 1, backgroundColor: themeState.value }}
+      keyboardShouldPersistTaps="handled"
+    >
+      <ImageBackground
+        source={require("../assets/img/clipart.png")}
+        style={{
+          width: "100%",
+          height: Dimensions.get("screen").height,
+          flex: 1,
+
+          justifyContent: "center",
+        }}
+      >
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "padding"}
           style={{ flex: 1 }}
         >
           <View style={styles.root}>
             <View style={{ flex: 0, alignItems: "center" }}>
-              <Typography variant="h2" color="#102660" fontWeight={700}>
-                Get Started
+              <Typography variant="h2" fontWeight={700}>
+                Sign Up
               </Typography>
             </View>
             <Modal
@@ -193,60 +207,39 @@ function Signup() {
               </View>
             </Modal>
             <View style={{ marginTop: 20, flex: 0, alignItems: "center" }}>
-              <TextInput
+              <TextField2
                 placeholder="First Name"
-                style={styles.input}
                 value={formdata.firstName}
-                placeholderTextColor="#102660"
                 onChangeText={(e) => setFormdata({ ...formdata, firstName: e })}
               />
-              <TextInput
+              <TextField2
                 placeholder="Last Name"
-                style={styles.input}
                 value={formdata.lastName}
-                placeholderTextColor="#102660"
                 onChangeText={(e) => setFormdata({ ...formdata, lastName: e })}
               />
-              <TextInput
+
+              <TextField2
                 placeholder="Country"
-                style={styles.input}
                 value={formdata.country}
-                placeholderTextColor="#102660"
                 onChangeText={(e) => setFormdata({ ...formdata, country: e })}
               />
 
-              <TextInput
-                placeholderTextColor="#102660"
-                onPressIn={() => {
-                  setModalVisible(!modalVisible), Keyboard.dismiss;
-                }}
-                placeholder="School Name"
-                style={styles.input}
-                value={formdata.school}
-              />
-
-              <TextInput
-                placeholderTextColor="#102660"
+              <TextField2
                 placeholder="Phone Number"
-                style={styles.input}
                 value={formdata.phoneNumber}
                 onChangeText={(e) =>
                   setFormdata({ ...formdata, phoneNumber: e })
                 }
               />
 
-              <TextInput
-                placeholderTextColor="#102660"
+              <TextField2
                 placeholder="Email Address"
-                style={styles.input}
                 value={email}
                 onChangeText={(e) => setEmail(e)}
               />
-              <TextInput
-                placeholderTextColor="#102660"
+              <TextField2
                 placeholder="Password"
                 secureTextEntry={true}
-                style={styles.input}
                 value={password}
                 onChangeText={(e) => setPassword(e)}
               />
@@ -262,7 +255,7 @@ function Signup() {
                 {loading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={styles.ButtonText}> Signup</Text>
+                  <Text style={styles.ButtonText}> Sign up</Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -277,7 +270,7 @@ function Signup() {
                 gap: 2,
               }}
             >
-              <Typography variant="h6" fontWeight={600} color="#102660">
+              <Typography variant="h6" fontWeight={600} color="#407BFF">
                 Already have an account
               </Typography>
               <TouchableOpacity
@@ -292,8 +285,8 @@ function Signup() {
             </View>
           </View>
         </KeyboardAvoidingView>
-      </ScrollView>
-    </SafeAreaView>
+      </ImageBackground>
+    </ScrollView>
   );
 }
 const styles = StyleSheet.create({
@@ -322,7 +315,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 8,
     paddingBottom: 8,
-    backgroundColor: "#102660",
+    backgroundColor: "#407BFF",
     borderRadius: 10,
   },
   input: {
@@ -332,7 +325,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     width: Dimensions.get("window").width - 20,
-    color: "#102660",
+    color: "#407BFF",
     borderColor: "#fff",
 
     backgroundColor: "#fff",

@@ -1,31 +1,30 @@
 import {
-  Image,
+  Alert,
+  Linking,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  PermissionsAndroid,
-  Platform,
-  ToastAndroid,
-  Alert,
-  ActivityIndicator,
-  Linking,
 } from "react-native";
 
-import * as FileSystem from "expo-file-system";
-import Typography from "../../components/custom/Typography";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
-import { useContext, useState } from "react";
-import { GlobalContext } from "../../context";
-import { Entypo } from "@expo/vector-icons";
-import Avatar from "../../components/custom/Avatar";
 import * as DocumentPicker from "expo-document-picker";
-
-import * as MediaLibrary from "expo-media-library";
+import * as FileSystem from "expo-file-system";
 import * as Permissions from "expo-permissions";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { FlatList, Modal } from "react-native";
+
+import Typography from "../../components/custom/Typography";
+import { GlobalContext } from "../../context";
+import { ResizeMode, Video } from "expo-av";
+import { Image } from "react-native";
+import Button from "../../components/custom/Button";
+import VideoPlayer from "../../components/VideoPlayer";
+import { removeObjectsWithoutParameter } from "../../utility";
+import PDFPreloader from "../../components/custom/PdfPreview";
 
 function Course({ route }) {
   const [loading, setLoading] = useState(false);
@@ -35,72 +34,105 @@ function Course({ route }) {
   const navigation = useNavigation();
   const [active, setActive] = useState(false);
   const [fileUri, setFileUri] = useState("");
+  const [array, setArray] = useState([]);
+  useEffect(() => {
+    data.forEach((obj) => {
+      const arr = Object?.keys(obj).map((key) => ({ ...obj[key] }));
+      const dat = removeObjectsWithoutParameter(arr, "courseTitle");
 
-  const url = data.courseUrl;
-  console.log();
+      console.log("data", dat);
+      setArray(dat);
+    });
+  }, [data]);
 
-  const downloadFile = async (url) => {
-    const directory = FileSystem.documentDirectory + "Analog Electronics/"; // replace with the desired directory name
-    const fileUri = directory + "file.pdf"; // replace with the desired file name and extension
-    setLoading(true);
-    try {
-      const { status } = await Permissions.getAsync(Permissions.CAMERA_ROLL);
+  const [isFullModeVisible, setFullModeVisible] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const videoPlayerRef = useRef(null);
+  const documents = [
+    {
+      title: "Lecture 1",
+      url: "",
+    },
+    {
+      title: "Lecture 2",
+      url: "",
+    },
+    {
+      title: "Lecture 3",
+      url: "",
+    },
+  ];
+  const videoData = [
+    {
+      id: 1,
+      url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      title: "Video 1",
+    },
+    {
+      id: 2,
+      url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+      title: "Video 2",
+    },
+    // Add more videos to the data array
+  ];
 
-      if (status === "granted") {
-        await FileSystem.makeDirectoryAsync(directory, { intermediates: true });
-
-        const downloadObject = FileSystem.createDownloadResumable(url, fileUri);
-
-        try {
-          const { uri } = await downloadObject.downloadAsync();
-        } catch (error) {
-          console.error("Error downloading file:", error);
-          setLoading(false);
-        }
-      } else {
-        const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-
-        if (status === "granted") {
-          await FileSystem.makeDirectoryAsync(directory, {
-            intermediates: true,
-          });
-
-          const downloadObject = FileSystem.createDownloadResumable(
-            url,
-            fileUri
-          );
-
-          try {
-            const { uri } = await downloadObject.downloadAsync();
-            Alert.alert("File Downloaded at " + " " + uri);
-            setLoading(false);
-          } catch (error) {
-            console.error("Error downloading file:", error);
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error checking permission:", error);
-      setLoading(false);
+  const renderItem = ({ item }) => {
+    return (
+      <TouchableOpacity
+        style={[
+          styles.videoThumbnail,
+          {
+            borderColor: themeState.mode === "light" ? "#000" : "#aaa",
+          },
+        ]}
+        onPress={() => {
+          setSelectedVideo(item.url);
+          setFullModeVisible(true);
+        }}
+      >
+        <Image
+          source={require("../../assets/img/video3.png")}
+          style={{ width: 200, height: 250, resizeMode: "contain" }}
+        />
+        <View
+          style={{
+            flex: 0,
+            alignItems: "flex-end",
+            flexDirection: "row",
+            justifyContent: "flex-end",
+            paddingRight: 2,
+          }}
+        >
+          <AntDesign
+            name="playcircleo"
+            size={24}
+            color={themeState.mode === "light" ? "#000" : "#aaa"}
+          />
+        </View>
+        {/* You can use custom video thumbnail images here */}
+      </TouchableOpacity>
+    );
+  };
+  const closeFullMode = () => {
+    setFullModeVisible(false);
+    setSelectedVideo(null);
+  };
+  const cancelFullMode = () => {
+    if (videoPlayerRef.current) {
+      videoPlayerRef.current.dismissFullscreenPlayer();
+    }
+  };
+  const onChangeFullscreen = (event) => {
+    const { isFullscreen } = event.nativeEvent;
+    if (!isFullscreen) {
+      closeFullMode();
     }
   };
 
-  const openDocumentFromUrl = async (url) => {
-    try {
-      const { uri } = await DocumentPicker.getDocumentAsync({
-        copyToCacheDirectory: false,
-        type: "*/*",
-        uri: url,
-      });
-      if (uri) {
-        // Open the document using the Expo Linking API
-        await Linking.openURL(uri);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  const onFullscreenPlayerDidDismiss = () => {
+    closeFullMode();
   };
-  console.log(data);
+  console.log("dataaaa", data);
   return (
     <SafeAreaView style={{ backgroundColor: themeState.value }}>
       <ScrollView
@@ -113,186 +145,232 @@ function Course({ route }) {
         <View style={styles.header}>
           <AntDesign
             name="arrowleft"
-            size={34}
-            color={themeState.mode === "dark" ? "#fff" : "#102660"}
+            size={28}
+            color={themeState.mode === "dark" ? "#fff" : "#000"}
             onPress={() => {
               navigation.goBack();
             }}
           />
-          <Typography variant="h5" fontWeight={700} color="#102660">
-            Course Details
+          <Typography variant="h5" fontWeight={700}>
+            {array[0]?.courseCategory}
           </Typography>
           <Text></Text>
         </View>
-        <View>
-          <Image source={{ uri: data?.image }} style={styles.image} />
-          <View style={{ paddingTop: 9, paddingBottom: 20 }}>
-            <TouchableOpacity
-              style={styles.Button}
-              onPress={() => {
-                Linking.openURL(data?.courseUrl);
-              }}
-            >
-              <Text style={styles.ButtonText}>View</Text>
-            </TouchableOpacity>
-          </View>
-          <View>
-            <Typography variant="h3" color="#102660" fontWeight={700}>
-              {data.courseTitle}
-            </Typography>
-          </View>
-          <View style={{ marginTop: 10 }}>
-            <Typography variant="body1" color="#102660">
-              Last Updated
-              <Text style={{ fontSize: 16, fontWeight: 700 }}>
-                {data?.createdAt}
-              </Text>
-            </Typography>
-          </View>
 
-          <View style={styles.Switch}>
-            <TouchableOpacity
-              style={
-                active
-                  ? styles.SwitchButtonNotActive
-                  : styles.SwitchButtonActive
-              }
-              onPress={() => {
-                setActive(!active);
-              }}
-            >
-              <Text
-                style={
-                  active
-                    ? styles.SwitchButtonText
-                    : styles.SwitchButtonTextNotActive
-                }
-              >
-                Description
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={
-                active
-                  ? styles.SwitchButtonActive
-                  : styles.SwitchButtonNotActive
-              }
-              onPress={() => {
-                setActive(!active);
-              }}
-            >
-              <Text
-                style={
-                  active
-                    ? styles.SwitchButtonTextActive
-                    : styles.SwitchButtonText
-                }
-              >
-                Author Details
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {active ? (
+        <View style={{ marginTop: 50 }}>
+          {/* <Typography variant="h6">
+            HTML is the standard markup language for Web pages. With HTML you
+            can create your own Website. HTML is easy to learn - You will enjoy
+            it!
+          </Typography>
+
+          <Typography variant="h6">
+            In this HTML course, you will find more than 20 documents and 40
+            Videos to help you
+          </Typography> */}
+        </View>
+        {array?.map((cur, i) => (
+          <View key={i}>
             <View
               style={{
-                marginTop: 20,
+                flex: 0,
+                justifyContent: "center",
+                alignItems: "center",
+                borderWidth: 1,
+                borderColor: "#000",
+                borderStyle: "solid",
+                marginTop: 40,
               }}
             >
+              <Typography variant="h5" fontWeight={700}>
+                {cur.courseTitle}
+              </Typography>
+            </View>
+
+            <View style={styles.Switch}>
+              <TouchableOpacity
+                style={
+                  active
+                    ? styles.SwitchButtonNotActive
+                    : styles.SwitchButtonActive
+                }
+                onPress={() => {
+                  setActive(!active);
+                }}
+              >
+                <Text
+                  style={
+                    active
+                      ? styles.SwitchButtonText
+                      : styles.SwitchButtonTextNotActive
+                  }
+                >
+                  Documents
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={
+                  active
+                    ? styles.SwitchButtonActive
+                    : styles.SwitchButtonNotActive
+                }
+                onPress={() => {
+                  setActive(!active);
+                }}
+              >
+                <Text
+                  style={
+                    active
+                      ? styles.SwitchButtonTextActive
+                      : styles.SwitchButtonText
+                  }
+                >
+                  Videos
+                </Text>
+              </TouchableOpacity>
+            </View>
+            {active ? (
               <View
                 style={{
-                  flex: 0,
-                  flexDirection: "row",
-
-                  justifyContent: "space-between",
-                  width: "100%",
+                  marginTop: 20,
                 }}
               >
                 <View
                   style={{
                     flex: 0,
-                    flexDirection: "row",
-                    gap: 10,
-                    marginTop: 15,
                     alignItems: "center",
-                  }}
-                >
-                  <Avatar src={require("../../assets/img/avatar.jpg")} />
-                  <View>
-                    <Typography variant="h6" fontWeight={700}>
-                      {data.authorName}
-                    </Typography>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    flex: 0,
-                    alignItems: "center",
-                    flexDirection: "row",
                     justifyContent: "center",
                   }}
                 >
-                  <Entypo
-                    name="star"
-                    size={18}
-                    color="#f90"
-                    style={{ marginRight: 4 }}
-                  />
-                  <Typography color="#102660" variant="body1">
-                    4.8
+                  <Typography fontWeight={700} variant="h5">
+                    Videos
                   </Typography>
                 </View>
-              </View>
-              <View style={{ marginTop: 40 }}>
-                <Typography variant="h6">
-                  <View style={{ marginRight: 10 }}></View>
-                  {data?.authorDescription}
-                </Typography>
-              </View>
-              <View style={{ marginTop: 40 }}>
-                <TouchableOpacity
-                  style={styles.Button}
-                  onPress={() => {
-                    navigation.navigate("Navigator");
-                  }}
-                >
-                  <Text style={styles.ButtonText}>Contact </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ) : (
-            <View style={{ marginTop: 20 }}>
-              <Typography variant="h6">
-                <View style={{ marginRight: 10 }}></View>
-                {data.courseDescription}
-              </Typography>
+                <View>
+                  <View style={styles.container}>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                    >
+                      {cur.videos?.map((item, i) => (
+                        <TouchableOpacity
+                          key={i}
+                          style={[
+                            styles.videoThumbnail,
+                            {
+                              borderColor:
+                                themeState.mode === "light" ? "#000" : "#aaa",
+                            },
+                          ]}
+                          onPress={() => {
+                            setSelectedVideo(item);
+                            setFullModeVisible(true);
+                          }}
+                        >
+                          <Video
+                            ref={videoPlayerRef}
+                            source={{ uri: item }}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              borderRadius: 15,
+                            }}
+                            useNativeControls
+                            resizeMode={ResizeMode.COVER}
+                            isLooping
+                          />
 
-              <View style={{ marginTop: 40 }}>
-                <TouchableOpacity
-                  style={styles.Button}
-                  onPress={() => {
-                    downloadFile(url);
-                  }}
-                >
-                  {loading ? (
-                    <View style={{ display: "flex", flexDirection: "row" }}>
-                      <Text style={styles.ButtonText}>Downloading</Text>
-                      <ActivityIndicator color="#fff" />
-                    </View>
-                  ) : (
-                    <Text style={styles.ButtonText}>
-                      Download{" "}
-                      <Entypo
-                        name="download"
-                        size={24}
-                        color="#fff"
-                        style={{ marginLeft: 2 }}
-                      />
-                    </Text>
-                  )}
-                </TouchableOpacity>
+                          {/* You can use custom video thumbnail images here */}
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+
+                    {/* Full Mode Video View */}
+                    {/* <Modal visible={isFullModeVisible} animationType="fade">
+                      <View style={styles.fullModeContainer}>
+                        <Video
+                          ref={videoPlayerRef}
+                          source={{ uri: selectedVideo }}
+                          style={styles.fullModeVideo}
+                          useNativeControls
+                          resizeMode={ResizeMode.CONTAIN}
+                          isLooping
+                          shouldPlay={isFullModeVisible}
+                          paused={!isFullModeVisible}
+                        />
+                        <TouchableOpacity
+                          style={styles.cancelButton}
+                          onPress={closeFullMode}
+                        >
+                          <Text style={styles.cancelButtonText}>
+                            Cancel Full Mode
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </Modal> */}
+                  </View>
+                </View>
               </View>
-            </View>
-          )}
+            ) : (
+              <View style={{ marginTop: 20 }}>
+                <View>
+                  <View
+                    style={{
+                      flex: 0,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: 10,
+                    }}
+                  >
+                    <Typography fontWeight={700} variant="h5">
+                      Documents
+                    </Typography>
+                  </View>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {cur.document?.map((item, i) => (
+                      <TouchableOpacity
+                        key={i}
+                        style={[
+                          styles.videoThumbnail,
+                          {
+                            borderColor:
+                              themeState.mode === "light" ? "#000" : "#aaa",
+                            padding: 10,
+                          },
+                        ]}
+                        onPress={() => {
+                          Linking.openURL(item);
+                        }}
+                      >
+                        <PDFPreloader pdfUrl={item} />
+                        <View
+                          style={{
+                            flex: 0,
+                            alignItems: "center",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            paddingRight: 2,
+                          }}
+                        >
+                          <View style={{ marginBottom: 3 }}>
+                            <Typography variant="h6" fontWeight={700}>
+                              {item.title}
+                            </Typography>
+                          </View>
+                        </View>
+                        {/* You can use custom video thumbnail images here */}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              </View>
+            )}
+          </View>
+        ))}
+        <View style={{ marginTop: 40, marginBottom: 40 }}>
+          <TouchableOpacity style={styles.Button}>
+            <Text style={styles.ButtonText}>Take Quiz</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -343,6 +421,7 @@ const styles = StyleSheet.create({
     flex: 0,
     flexDirection: "row",
     marginTop: 20,
+    justifyContent: "center",
   },
   Button: {
     height: 50,
@@ -350,37 +429,38 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
 
-    backgroundColor: "#102660",
+    backgroundColor: "#407BFF",
 
     borderRadius: 5,
-    borderWidth: 1,
+
+    border: "none",
   },
   SwitchButton: {
     height: 50,
-    width: 150,
+    width: "50%",
     flex: 0,
     alignItems: "center",
     justifyContent: "center",
 
-    backgroundColor: "#fff",
+    backgroundColor: "#f7f7f7",
   },
   SwitchButtonNotActive: {
     height: 50,
-    width: 150,
+    width: "50%",
     flex: 0,
     alignItems: "center",
     justifyContent: "center",
 
-    backgroundColor: "#fff",
+    backgroundColor: "#f7f7f7",
   },
   SwitchButtonActive: {
     height: 50,
-    width: 150,
+    width: "50%",
     flex: 0,
     alignItems: "center",
     justifyContent: "center",
 
-    backgroundColor: "#102660",
+    backgroundColor: "#407BFF",
   },
   Button: {
     height: 50,
@@ -388,7 +468,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
 
-    backgroundColor: "#102660",
+    backgroundColor: "#407BFF",
 
     borderRadius: 5,
     borderWidth: 1,
@@ -398,6 +478,41 @@ const styles = StyleSheet.create({
     height: 300,
     marginTop: 30,
     borderRadius: 10,
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 10,
+    paddingTop: 10,
+  },
+  cancelButton: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+    padding: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 5,
+  },
+  cancelButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  videoThumbnail: {
+    minWidth: 200,
+    minHeight: 250,
+    marginRight: 10,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderRadius: 20,
+  },
+  fullModeContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "black",
+  },
+  fullModeVideo: {
+    width: "100%",
+    height: "100%",
   },
 });
 export default Course;

@@ -26,12 +26,12 @@ function AccountSettings() {
           <AntDesign
             name="arrowleft"
             size={24}
-            color={themeState.mode === "dark" ? "#fff" : "#102660"}
+            color={themeState.mode === "dark" ? "#fff" : "#407BFF"}
             onPress={() => {
               navigation.goBack();
             }}
           />
-          <Typography variant="h5" fontWeight={700} color="#102660">
+          <Typography variant="h5" fontWeight={700} color="#407BFF">
             Edit Profile
           </Typography>
           <Text></Text>
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 8,
     paddingBottom: 8,
-    backgroundColor: "#102660",
+    backgroundColor: "#407BFF",
     borderRadius: 7,
     width: "100%",
     marginTop: 40,

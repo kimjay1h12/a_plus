@@ -1,30 +1,21 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Users\kimjay\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add react-native-flip-move
+  C:\Program Files\nodejs\node.exe C:\Users\Kim Jay\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add react-native-size-matters
 
 PATH: 
-  C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Users\kimjay\AppData\Local\Microsoft\WindowsApps;;C:\Users\kimjay\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\kimjay\AppData\Roaming\npm
+  C:\Program Files (x86)\VMware\VMware Player\bin\;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\dotnet\;C:\Users\Kim Jay\AppData\Local\Microsoft\WindowsApps;C:\Users\Kim Jay\AppData\Roaming\npm;C:\Users\Kim Jay\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files (x86)\SDCC\bin
 
 Yarn version: 
   1.22.19
 
 Node version: 
-  18.13.0
+  18.16.0
 
 Platform: 
   win32 x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/react-native-flip-move: Not found
-      at params.callback [as _callback] (C:\Users\kimjay\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:66145:18)
-      at self.callback (C:\Users\kimjay\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:140890:22)
-      at Request.emit (node:events:513:28)
-      at Request.<anonymous> (C:\Users\kimjay\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141862:10)
-      at Request.emit (node:events:513:28)
-      at IncomingMessage.<anonymous> (C:\Users\kimjay\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141784:12)
-      at Object.onceWrapper (node:events:627:28)
-      at IncomingMessage.emit (node:events:525:35)
-      at endReadableNT (node:internal/streams/readable:1359:12)
-      at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+  Error: getaddrinfo ENOTFOUND registry.yarnpkg.com
+      at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26)
 
 npm manifest: 
   {
@@ -46,9 +37,11 @@ npm manifest:
       "@react-navigation/native-stack": "^6.9.12",
       "expo": "^48.0.0",
       "expo-application": "~5.1.1",
+      "expo-av": "~13.2.1",
       "expo-calendar": "~11.1.1",
       "expo-document-picker": "~11.2.2",
       "expo-file-system": "~15.2.2",
+      "expo-haptics": "~12.2.1",
       "expo-image-picker": "~14.1.1",
       "expo-intent-launcher": "~10.5.2",
       "expo-media-library": "~15.2.3",
@@ -3886,6 +3879,11 @@ Lockfile:
       path-browserify "^1.0.0"
       url-parse "^1.5.9"
   
+  expo-av@~13.2.1:
+    version "13.2.1"
+    resolved "https://registry.yarnpkg.com/expo-av/-/expo-av-13.2.1.tgz#ce502a4c5d4a57962fd9f5f1a40c76c39c88f5ee"
+    integrity sha512-mC0mYSzaOaZgXjzhW2l4Ag325JjH6q5IbptfwD7gkMOFYy7VPOMxEMUnetadbs3DDzmgE6vUWrTjUIUbwq59qg==
+  
   expo-calendar@~11.1.1:
     version "11.1.1"
     resolved "https://registry.yarnpkg.com/expo-calendar/-/expo-calendar-11.1.1.tgz#c790dce535dc97fb15982b54b1c59c46dfe21d8d"
@@ -3922,6 +3920,11 @@ Lockfile:
     integrity sha512-X+aICqYY69hiiDDtcNrjq8KutHrH2TrHuMqk0Rfq0P7hF6hMd+YefwLBNkvIrqrgmTAuqiLjMUwj2rHLqmgluw==
     dependencies:
       fontfaceobserver "^2.1.0"
+  
+  expo-haptics@~12.2.1:
+    version "12.2.1"
+    resolved "https://registry.yarnpkg.com/expo-haptics/-/expo-haptics-12.2.1.tgz#9705c245663fcf317ca19adc2e8bbcb5270562e7"
+    integrity sha512-XRZtmIQi901Q4+/cZnVrULRFOqShsgCuSP0SCbVEhnq8sK0OA4jgun12O93Pu5aGvTyoqsAcIArE8tX+8AEqRA==
   
   expo-image-loader@~4.1.0:
     version "4.1.1"

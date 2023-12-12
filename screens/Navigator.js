@@ -17,7 +17,7 @@ import Todo from "./Todo";
 import Course from "./course/u";
 import Allcourses from "./categories/Allcourses";
 import { useColorScheme } from "react-native";
-
+import { Feather } from "@expo/vector-icons";
 const Tab = createBottomTabNavigator();
 function Navigator() {
   const colorScheme = useColorScheme();
@@ -38,6 +38,7 @@ function Navigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+
         tabBarStyle: {
           backgroundColor: themeState.value,
         },
@@ -51,7 +52,7 @@ function Navigator() {
           tabBarIcon: ({ color, size }) => (
             <Entypo name="home" size={size} color={color} />
           ),
-          tabBarActiveTintColor: "#5555b2",
+          tabBarActiveTintColor: "#407BFF",
           title: "Home",
 
           headerTransparent: true,
@@ -65,46 +66,6 @@ function Navigator() {
           },
         }}
       />
-      <Tab.Screen
-        name="Search"
-        component={Search}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="search" size={size} color={color} />
-          ),
-          tabBarActiveTintColor: "#5555b2",
-          title: "Search",
-
-          headerTransparent: true,
-          headerStyle: {
-            backgroundColor: "transparent",
-          },
-          headerTintColor: "transparent",
-          headerTitleStyle: {
-            fontSize: 16,
-          },
-        }}
-      />
-      <Tab.Screen
-        name="Post"
-        component={Post}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <AntDesign name="pluscircle" size={34} color={color} />
-          ),
-          tabBarActiveTintColor: "#5555b2",
-          title: "Post",
-
-          headerTransparent: true,
-          headerStyle: {
-            backgroundColor: "transparent",
-          },
-          headerTintColor: "transparent",
-          headerTitleStyle: {
-            fontSize: 16,
-          },
-        }}
-      />
 
       <Tab.Screen
         name="Favourite"
@@ -113,7 +74,7 @@ function Navigator() {
           tabBarIcon: ({ color, size }) => (
             <Entypo name="open-book" size={size} color={color} />
           ),
-          tabBarActiveTintColor: "#5555b2",
+          tabBarActiveTintColor: "#407BFF",
           title: "Courses",
 
           headerTransparent: true,
@@ -126,16 +87,56 @@ function Navigator() {
           },
         }}
       />
+      <Tab.Screen
+        name="post"
+        component={Post}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="calendar" size={size} color={color} />
+          ),
+          tabBarActiveTintColor: "#407BFF",
+          title: "post",
 
+          headerTransparent: true,
+          headerStyle: {
+            backgroundColor: "transparent",
+          },
+          headerTintColor: "transparent",
+          headerTitleStyle: {
+            fontSize: 16,
+          },
+        }}
+      />
       <Tab.Screen
         name="Todo"
         component={Todo}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="event-available" size={size} color={color} />
+            <Feather name="calendar" size={size} color={color} />
           ),
-          tabBarActiveTintColor: "#5555b2",
+          tabBarActiveTintColor: "#407BFF",
           title: "Todo",
+
+          headerTransparent: true,
+          headerStyle: {
+            backgroundColor: "transparent",
+          },
+          headerTintColor: "transparent",
+          headerTitleStyle: {
+            fontSize: 16,
+          },
+        }}
+      />
+
+      <Tab.Screen
+        name="profile"
+        component={Profile}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="user" size={size} color={color} />
+          ),
+          tabBarActiveTintColor: "#407BFF",
+          title: "profile",
 
           headerTransparent: true,
           headerStyle: {

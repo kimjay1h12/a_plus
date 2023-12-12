@@ -134,12 +134,12 @@ function Todo() {
             <AntDesign
               name="arrowleft"
               size={34}
-              color={themeState.mode === "dark" ? "#fff" : "#102660"}
+              color={themeState.mode === "dark" ? "#fff" : "#407BFF"}
               onPress={() => {
                 navigation.goBack();
               }}
             />
-            <Typography variant="h5" fontWeight={700} color="#102660">
+            <Typography variant="h5" fontWeight={700} color="#407BFF">
               Events
             </Typography>
             <TouchableOpacity
@@ -150,7 +150,7 @@ function Todo() {
               <Entypo
                 name="circle-with-plus"
                 size={34}
-                color={themeState.mode === "dark" ? "#fff" : "#102660"}
+                color={themeState.mode === "dark" ? "#fff" : "#407BFF"}
               />
             </TouchableOpacity>
           </View>
@@ -179,7 +179,7 @@ function Todo() {
                 <FontAwesome
                   name="calendar-check-o"
                   size={74}
-                  color="#102660"
+                  color="#407BFF"
                 />
                 <View style={{ flex: 0, gap: 6 }}>
                   <Typography variant="h5" fontWeight={600} active={false}>
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
 
-    color: "#102660",
+    color: "#407BFF",
     borderColor: "#fff",
 
     backgroundColor: "#fff",
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 8,
     paddingBottom: 8,
-    backgroundColor: "#102660",
+    backgroundColor: "#407BFF",
     borderRadius: 10,
   },
   input: {
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
 
-    color: "#102660",
+    color: "#407BFF",
     borderColor: "#fff",
 
     backgroundColor: "#fff",

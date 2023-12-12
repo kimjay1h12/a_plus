@@ -83,18 +83,25 @@ function Profile() {
         <View style={styles.header}>
           <AntDesign
             name="arrowleft"
-            size={34}
-            color={themeState.mode === "dark" ? "#fff" : "#102660"}
+            size={28}
+            color={themeState.mode === "dark" ? "#aaa" : "#fff"}
             onPress={() => {
               navigation.goBack();
             }}
           />
-          <Typography variant="h5" fontWeight={700} color="#102660">
+          <Typography variant="h5" fontWeight={700}>
             Profile
           </Typography>
           <Text></Text>
         </View>
-        <View style={styles.profileHeader}>
+        <View
+          style={[
+            styles.profileHeader,
+            {
+              backgroundColor: themeState.mode === "dark" ? "#222" : "#f7f7f7",
+            },
+          ]}
+        >
           <Image
             style={{ width: 90, height: 90, borderRadius: 80 }}
             source={require("../assets/img/user.jpg")}
@@ -135,7 +142,7 @@ function Profile() {
             >
               <View
                 style={{
-                  backgroundColor: "#102660",
+                  backgroundColor: "#407BFF",
                   width: 50,
                   borderRadius: 40,
                   height: 50,
@@ -283,7 +290,7 @@ const styles = StyleSheet.create({
     flex: 0,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#fff",
+
     height: 250,
     marginTop: 40,
     borderRadius: 10,

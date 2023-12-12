@@ -17,7 +17,7 @@ export const GlobalContext = createContext({
 const GlobalProvider = ({ children }) => {
   const [themeState, themeDispatch] = useReducer(themeReducer, {
     mode: "default",
-    value: "#f7f7f7",
+    value: "#fff",
     textvalue: "white",
   });
   const [authState, authDispatch] = useReducer(auth, {

@@ -18,6 +18,9 @@ import AccountSettings from "../screens/profile/AccountSettings";
 import SignUp from "./Signup";
 import Profile from "./Profile";
 import CreateEvents from "./CreateEvents";
+import Quiz from "./Quiz";
+import Questions from "./quiz/Questions";
+import Result from "./quiz/Result";
 
 export default function App({ loggedIn }) {
   const RootStack = createNativeStackNavigator();
@@ -42,6 +45,9 @@ export default function App({ loggedIn }) {
           <RootStack.Screen name="AllCategories" component={AllCategories} />
           <RootStack.Screen name="Profile" component={Profile} />
           <RootStack.Screen name="CreateEvents" component={CreateEvents} />
+          <RootStack.Screen name="quiz" component={Quiz} />
+          <RootStack.Screen name="questions" component={Questions} />
+          <RootStack.Screen name="ResultScreen" component={Result} />
 
           <RootStack.Screen
             name="AccountSettings"

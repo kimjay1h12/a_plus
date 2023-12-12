@@ -70,12 +70,12 @@ function Search() {
           <AntDesign
             name="arrowleft"
             size={34}
-            color={themeState.mode === "dark" ? "#fff" : "#102660"}
+            color={themeState.mode === "dark" ? "#fff" : "#407BFF"}
             onPress={() => {
               navigation.goBack();
             }}
           />
-          <Typography variant="h5" fontWeight={700} color="#102660">
+          <Typography variant="h5" fontWeight={700} color="#407BFF">
             Search
           </Typography>
           <Text></Text>
@@ -92,7 +92,7 @@ function Search() {
             marginTop: 40,
           }}
         >
-          <Feather name="search" size={20} color="#102660" />
+          <Feather name="search" size={20} color="#407BFF" />
           <TextInput
             style={{
               flex: 1,
@@ -101,7 +101,7 @@ function Search() {
             }}
             placeholder="Course Name and course code"
             placeholderTextColor={
-              themeState.mode === "dark" ? "#fff" : "#102660"
+              themeState.mode === "dark" ? "#fff" : "#407BFF"
             }
             value={searchParam}
             onChangeText={(e) => {
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f7f7f7",
+    backgroundColor: "#fff",
     borderRadius: 10,
     paddingVertical: 18,
     paddingHorizontal: 12,
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     marginLeft: 10,
-    color: "#102660",
+    color: "#407BFF",
   },
 });
 export default Search;

@@ -1,5 +1,5 @@
 {
-   "cli": {
+  "cli": {
     "version": ">= 0.38.2"
   },
   "expo": {
@@ -12,11 +12,9 @@
     "splash": {
       "image": "./assets/img/newsplash.png",
       "resizeMode": "cover",
-      "backgroundColor": "#102660"
+      "backgroundColor": "#407BFF"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "plugins": [
       [
         "expo-calendar",

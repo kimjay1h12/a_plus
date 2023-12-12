@@ -1,33 +1,42 @@
 import {
+  AntDesign,
+  Feather,
+  Ionicons,
+  MaterialIcons,
+} from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/core";
+import { child, get, onValue, ref } from "firebase/database";
+import { useCallback, useContext, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
   Dimensions,
-  Platform,
   RefreshControl,
   ScrollView,
+  StatusBar,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
-  Image,
-  StatusBar,
-  ActivityIndicator,
 } from "react-native";
-
-import { MaterialIcons } from "@expo/vector-icons";
-import Typography from "../components/custom/Typography";
-import { Entypo } from "@expo/vector-icons";
-import ImageSlider from "../components/ImageSlider";
-import CourseCard from "../components/CourseCard";
-import { useNavigation } from "@react-navigation/core";
-import { useCallback, useContext, useEffect, useState } from "react";
-import themeReducer from "../context/reducer/themeReducer";
-import { GlobalContext } from "../context";
-import { Categories } from "../utility";
-import { Ionicons } from "@expo/vector-icons";
-import { child, get, onValue, ref, set } from "firebase/database";
-import { db } from "../firebase";
-import { LineChart } from "react-native-chart-kit";
+import * as Progress from "react-native-progress";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Typography from "../components/custom/Typography";
+import { GlobalContext } from "../context";
+import { db } from "../firebase";
+const courses = [
+  {
+    title: "Web Development",
+    value: "web_development",
+    description:
+      "Web development, also known as website development, refers to the tasks associated with creating, building, and maintaining websites and web applications that run online on a browser. It may, however, also include web design, web programming, and database management.",
+  },
+  {
+    title: "Mobile App Development",
+    value: "mobileapp_development",
+
+    description:
+      "Mobile application development is the process of creating software applications that run on a mobile device, and a typical mobile application utilizes a network connection to work with remote computing resources.",
+  },
+];
 function Home() {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
@@ -80,7 +89,7 @@ function Home() {
       }
     });
   };
-
+  console.log("all courses", allCourses);
   useEffect(() => {
     GetCourses();
   }, []);
@@ -107,6 +116,7 @@ function Home() {
     >
       <StatusBar translucent={true} />
       <ScrollView
+        style={{ padding: 15 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -117,25 +127,11 @@ function Home() {
           style={{
             flex: 0,
             flexDirection: "row",
-            padding: 12,
+
             justifyContent: "space-between",
             alignItems: "center",
           }}
         >
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("Profile");
-            }}
-          >
-            <Image
-              style={{
-                width: 42,
-                height: 42,
-                borderRadius: 40,
-              }}
-              source={require("../assets/img/user.jpg")}
-            />
-          </TouchableOpacity>
           <View
             style={{
               flex: 0,
@@ -144,168 +140,203 @@ function Home() {
             }}
           >
             {userData?.firstName ? (
-              <View>
-                <Typography variant="h5" fontWeight={700}>
+              <View
+                style={{ flex: 0, alignItems: "center", flexDirection: "row" }}
+              >
+                <Typography variant="h6">Welcome , </Typography>
+                <Typography variant="h6" fontWeight={700}>
                   {userData?.firstName + " " + userData?.lastName}
                 </Typography>
-                <Typography variant="body2">{userData?.email}</Typography>
               </View>
             ) : (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color="#000" />
             )}
           </View>
           <Ionicons
-            name="notifications"
-            size={34}
-            color={themeState.mode === "dark" ? "#fff" : "#102660"}
+            name="notifications-outline"
+            size={28}
+            color={themeState.mode === "dark" ? "#fff" : "#000"}
           />
         </View>
-        <View style={{ padding: 10, marginTop: 10 }}>
-          <View
-            style={{
-              backgroundColor: themeState.mode === "dark" ? "#222" : "#fff",
-              padding: 20,
-              borderRadius: 16,
-              flex: 0,
-              justifyContent: "space-between",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <MaterialCommunityIcons
-              name="chart-bar-stacked"
-              size={44}
-              color={themeState.mode === "dark" ? "#fff" : "#102660"}
-            />
-            <Text
-              style={{
-                color: themeState.mode === "dark" ? "#fff" : "#102660",
-                fontWeight: 600,
-                fontSize: 17,
-              }}
-            >
-              You have 2 upcomming Events
-            </Text>
-            <MaterialIcons
-              name="keyboard-arrow-right"
-              size={34}
-              color={themeState.mode === "dark" ? "#fff" : "#102660"}
-            />
-          </View>
-        </View>
-        <View style={{ padding: 10, marginTop: 10 }}>
-          <View style={{ marginBottom: 20 }}>
-            <Typography variant="h5" fontWeight={600} color="#102660">
-              General Usage Report
-            </Typography>
-          </View>
-          <LineChart
-            data={{
-              labels: ["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"],
-              datasets: [
-                {
-                  data: [
-                    data?.Monday || 0,
-                    data?.Tuesday || 0,
-                    data?.Wednesday || 0,
-                    data?.Thursday || 0,
-                    data?.Friday || 0,
-                    data?.Saturday || 0,
-                    data?.Sunday || 0,
-                  ],
-                },
-              ],
-            }}
-            width={Dimensions.get("window").width - 20} // from react-native
-            height={220}
-            yAxisLabel=""
-            yAxisSuffix=""
-            yAxisInterval={1} // optional, defaults to 1
-            chartConfig={{
-              backgroundColor: themeState.mode === "dark" ? "#222" : "#fff",
-              backgroundGradientFrom:
-                themeState.mode === "dark" ? "#222" : "#fff",
-              backgroundGradientTo:
-                themeState.mode === "dark" ? "#222" : "#fff",
-              decimalPlaces: 2, // optional, defaults to 2dp
-              color: (opacity = 1) =>
-                `${themeState.mode === "dark" ? "#fff" : "#102660"}`,
-              labelColor: (opacity = 1) =>
-                `${themeState.mode === "dark" ? "#fff" : "#102660"}`,
-
-              propsForDots: {
-                r: "6",
-                strokeWidth: "2",
-                stroke: "#102660",
-              },
-            }}
-            bezier
-            style={{
-              borderRadius: 16,
-            }}
-          />
-        </View>
-        <View style={styles.Category}>
-          <View style={styles.CategoryHeader}>
-            <Typography variant="h5" fontWeight={600} color="#102660">
-              Category
-            </Typography>
+        <View
+          style={{
+            marginTop: 40,
+            flex: 0,
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexDirection: "row",
+          }}
+        >
+          <View style={{ flex: 0, alignItems: "center" }}>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("AllCategories");
+                navigation.navigate("quiz");
+              }}
+              style={{
+                backgroundColor:
+                  themeState.mode === "light" ? "#f7f7f7" : "#222",
+                borderRadius: 40,
+                width: 80,
+                height: 80,
+                flex: 0,
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 10,
               }}
             >
-              <Typography variant="body2" fontWeight={600} color="blue">
-                See All
-              </Typography>
+              <Ionicons
+                name="ios-book-outline"
+                size={28}
+                color={themeState.mode === "light" ? "#000" : "#aaa"}
+              />
             </TouchableOpacity>
+            <Typography variant="h6">Quiz</Typography>
           </View>
-          <ScrollView horizontal style={styles.CategoryContent}>
-            {Categories?.map((cur, index) => (
-              <TouchableOpacity key={index}>
-                <View
-                  style={{
-                    backgroundColor:
-                      themeState.mode === "dark" ? "#222" : "#fff",
-                    minHeight: 120,
-                    shadowColor: "#fff",
-                    flex: 0,
-                    minWidth: 190,
-                    justifyContent: "center",
-                    padding: 20,
-                    borderRadius: 10,
-                    marginRight: 10,
-                  }}
-                >
-                  <Text style={{ marginBottom: 10 }}>
-                    <Entypo
-                      name="book"
-                      size={34}
-                      color={themeState.mode === "dark" ? "#fff" : "#102660"}
-                    />
-                  </Text>
-                  <Text
-                    style={{
-                      color: themeState.mode === "dark" ? "#fff" : "#102660",
-                    }}
-                  >
-                    {cur}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          <View style={{ flex: 0, alignItems: "center" }}>
+            <TouchableOpacity
+              style={{
+                backgroundColor:
+                  themeState.mode === "light" ? "#f7f7f7" : "#222",
+                borderRadius: 40,
+                width: 80,
+                height: 80,
+                flex: 0,
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 10,
+              }}
+            >
+              <MaterialIcons
+                name="event"
+                size={28}
+                color={themeState.mode === "light" ? "#000" : "#aaa"}
+              />
+            </TouchableOpacity>
+            <Typography variant="h6">Task</Typography>
+          </View>
+          <View style={{ flex: 0, alignItems: "center" }}>
+            <TouchableOpacity
+              style={{
+                backgroundColor:
+                  themeState.mode === "light" ? "#f7f7f7" : "#222",
+                borderRadius: 40,
+                width: 80,
+                height: 80,
+                flex: 0,
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 10,
+              }}
+            >
+              <AntDesign
+                name="edit"
+                size={28}
+                color={themeState.mode === "light" ? "#000" : "#aaa"}
+              />
+            </TouchableOpacity>
+            <Typography variant="h6">Note</Typography>
+          </View>
+          <View style={{ flex: 0, alignItems: "center" }}>
+            <TouchableOpacity
+              style={{
+                backgroundColor:
+                  themeState.mode === "light" ? "#f7f7f7" : "#222",
+                borderRadius: 40,
+                width: 80,
+                height: 80,
+                flex: 0,
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 10,
+              }}
+            >
+              <Feather
+                name="more-horizontal"
+                size={24}
+                color={themeState.mode === "light" ? "#000" : "#aaa"}
+              />
+            </TouchableOpacity>
+            <Typography variant="h6">Other</Typography>
+          </View>
+        </View>
 
+        <View style={styles.Category}>
           <View style={styles.TopCoursesHeader}>
-            <Typography variant="h5" fontWeight={600} color="#102660">
-              Top Courses
+            <Typography variant="h5" fontWeight={600}>
+              Top Course
             </Typography>
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("Allcourse", { data: allCourses });
               }}
             >
-              <Typography variant="body2" fontWeight={600} color="blue">
+              <Typography variant="body2" fontWeight={600} color="#407BFF">
+                See All
+              </Typography>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView
+            horizontal
+            style={styles.CategoryContent}
+            showsHorizontalScrollIndicator={false}
+          >
+            {courses.map((cur, index) => (
+              <TouchableOpacity
+                style={{
+                  backgroundColor:
+                    themeState.mode === "light" ? "#f7f7f7" : "#222",
+                  maxHeight: 250,
+                  width: 300,
+                  borderRadius: 6,
+                  padding: 15,
+                  marginRight: 9,
+                }}
+                key={index}
+                onPress={() => {
+                  const filteredArray = allCourses.filter(
+                    (obj) => obj.key === cur.value
+                  );
+
+                  navigation.navigate("Course", {
+                    data: filteredArray,
+                  });
+                }}
+              >
+                <View style={{ flex: 0, justifyContent: "space-between" }}>
+                  <View>
+                    <Typography variant="h4" fontWeight={700}>
+                      {cur.title}
+                    </Typography>
+                    <View style={{ marginTop: 10 }}>
+                      <Typography color="#aaa">{cur.description}</Typography>
+                    </View>
+                  </View>
+                </View>
+                {/* <CourseCard
+                  description={cur.courseDescription}
+                  url={cur.image}
+                  author={cur.authorName}
+                  rating={4.8}
+                  category={cur.category}
+                  title={cur.courseTitle}
+                /> */}
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
+        <View style={styles.Category}>
+          <View style={styles.TopCoursesHeader}>
+            <Typography variant="h5" fontWeight={600}>
+              Your Course
+            </Typography>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("Allcourse", { data: allCourses });
+              }}
+            >
+              <Typography variant="body2" fontWeight={600} color="#407BFF">
                 See All
               </Typography>
             </TouchableOpacity>
@@ -314,6 +345,15 @@ function Home() {
           <ScrollView horizontal style={styles.CategoryContent}>
             {course?.map((cur, index) => (
               <TouchableOpacity
+                style={{
+                  backgroundColor:
+                    themeState.mode === "light" ? "#f7f7f7" : "#222",
+
+                  minHeight: 400,
+                  width: Dimensions.get("screen").width - 30,
+                  borderRadius: 6,
+                  padding: 15,
+                }}
                 key={index}
                 onPress={() => {
                   navigation.navigate("Course", {
@@ -330,14 +370,80 @@ function Home() {
                   });
                 }}
               >
-                <CourseCard
+                <View>
+                  <Typography fontWeight={700} variant="h4">
+                    Html / Css
+                  </Typography>
+                  <View
+                    style={{
+                      flex: 0,
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      flexDirection: "row",
+                      marginTop: 30,
+                    }}
+                  >
+                    <View>
+                      <Typography variant="h6">Your Personal Task</Typography>
+                      <View style={{ marginTop: 10 }}>
+                        <Typography variant="h6">2/2 done</Typography>
+                      </View>
+                    </View>
+                    <View>
+                      <Typography variant="h6">Your Personal Task</Typography>
+                      <View style={{ marginTop: 10 }}>
+                        <Typography variant="h6">2/2 done</Typography>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{ marginTop: 40 }}>
+                  <Typography variant="h6">Author</Typography>
+                </View>
+                <View style={{ marginTop: 10 }}>
+                  <Typography variant="h6">Jimoh Akeem Olawale</Typography>
+                </View>
+                <View
+                  style={{
+                    flex: 0,
+                    alignItems: "center",
+                    flexDirection: "row",
+                    gap: 5,
+                    marginTop: 20,
+                  }}
+                >
+                  <Ionicons name="ios-warning-outline" size={24} color="#000" />
+                  <Typography variant="body1">
+                    Please complete your task
+                  </Typography>
+                </View>
+                <View
+                  style={{
+                    width: "100%",
+                    padding: 0.3,
+                    backgroundColor: "#f7f7f7",
+                    marginTop: 30,
+                  }}
+                ></View>
+                <View style={{ marginTop: 30 }}>
+                  <Progress.Bar
+                    progress={0.3}
+                    width={Dimensions.get("screen").width - 60}
+                  />
+                  <View style={styles.row}>
+                    <Typography variant="h6">Course Progress</Typography>
+                    <Typography variant="h6">30%</Typography>
+                  </View>
+                </View>
+                {/* <CourseCard
                   description={cur.courseDescription}
                   url={cur.image}
                   author={cur.authorName}
                   rating={4.8}
                   category={cur.category}
                   title={cur.courseTitle}
-                />
+                /> */}
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -347,12 +453,9 @@ function Home() {
   );
 }
 const styles = StyleSheet.create({
-  root: {
-    padding: 10,
-  },
+  root: {},
   ImageSlider: {},
   Category: {
-    padding: 15,
     marginTop: 10,
   },
   CategoryHeader: {
@@ -361,12 +464,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  row: {
+    flex: 0,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+  },
   TopCoursesHeader: {
     flex: 0,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 30,
+    marginTop: 60,
   },
 
   CategoryContent: {
